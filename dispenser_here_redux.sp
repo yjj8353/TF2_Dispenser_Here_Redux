@@ -43,9 +43,9 @@ public void OnPluginStart()
 	 * g_admin		 : 관리자 플래그
 	 ***************************************************************/
 	
-	g_enable	  = CreateConVar("sm_disp_enable", "1", "Enable/Disable dispenser here plugin");
-	g_blueprint   = CreateConVar("sm_disp_blueprint", "1", "Enable/Disable the blueprint");
-	g_prop 		  = CreateConVar("sm_disp_prop", "1", "Enable/Disable the prop");
+	g_enable	  = CreateConVar("sm_disp_enable", "1", "Enable/Disable dispenser here plugin", _, true, 0.0, true, 1.0);
+	g_blueprint   = CreateConVar("sm_disp_blueprint", "1", "Enable/Disable the blueprint", _, true, 0.0, true, 1.0);
+	g_prop 		  = CreateConVar("sm_disp_prop", "1", "Enable/Disable the prop", _, true, 0.0, true, 1.0);
 	g_restriction = CreateConVar("sm_disp_time", "1", "Time between spawn the model");
 	g_remove 	  = CreateConVar("sm_disp_remove", "10.0", "Time to remove the model");
 	g_limit 	  = CreateConVar("sm_disp_limit", "0", "building per person. 0 to disable checking.");
