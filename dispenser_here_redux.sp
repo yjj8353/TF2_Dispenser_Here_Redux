@@ -1,8 +1,10 @@
 #include <sourcemod>
 #include <sdktools>
+#include <tf2>			// TF*
+#include <tf2_stocks>	// TF2_*
 
-#pragma semicolon 1
-#pragma newdecls required
+#pragma semicolon 1;
+#pragma newdecls required;
 
 public Plugin myinfo = 
 {
@@ -16,8 +18,8 @@ public Plugin myinfo =
 char voiceMenu1[4];
 char voiceMenu2[4];
 
-lastUsed[MAXPLAYERS + 1] = { 0, ... };
-building[MAXPLAYERS + 1] = { 0, ... };
+int lastUsed[MAXPLAYERS + 1] = { 0, ... };
+int building[MAXPLAYERS + 1] = { 0, ... };
 
 Handle g_enable 	 = INVALID_HANDLE;
 Handle g_blueprint 	 = INVALID_HANDLE;
@@ -29,7 +31,7 @@ Handle g_admin 		 = INVALID_HANDLE;
 
 public void OnPluginStart()
 {
-	RegConsoleCmd("voicemenue", CommandVoiceMenu);
+	RegConsoleCmd("voicemenu", CommandVoiceMenu);
 	
 	/***************************************************************
 	 * g_enable		 : 플러그인 활성화 여부
@@ -41,23 +43,23 @@ public void OnPluginStart()
 	 * g_admin		 : 관리자 플래그
 	 ***************************************************************/
 	
-	g_enable	  = CreateConVar("sm_disp_enable", "1", "Enable/Disable dispenser here plugin", _, true, 0.0, true, 1.0);
-	g_blueprint   = CreateConVar("sm_disp_blueprint", "1", "Enable/Disable the blueprint", _, true, 0.0, true, 1.0);
-	g_prop 		  = CreateConVar("sm_disp_prop", "1", "Enable/Disable the prop", _, true, 0.0, true, 1.0);
-	g_restriction = CreateConVar("sm_disp_time", "1", "Time between spawn the model", _, true, 0.0, false, 0.0);
-	g_remove 	  = CreateConVar("sm_disp_remove", "10.0", "Time to remove the model", _, true, 0.0, false, 0.0);
-	g_limit 	  = CreateConVar("sm_disp_limit", "0", "building per person. 0 to disable checking.", _, true, 0.0, false, 0.0);
-	g_admin		  = CreateConVar("sm_disp_admin", "0", "Enable/disable Admin flag check", _, true, 0.0, true, 1.0);
+	g_enable	  = CreateConVar("sm_disp_enable", "1", "Enable/Disable dispenser here plugin");
+	g_blueprint   = CreateConVar("sm_disp_blueprint", "1", "Enable/Disable the blueprint");
+	g_prop 		  = CreateConVar("sm_disp_prop", "1", "Enable/Disable the prop");
+	g_restriction = CreateConVar("sm_disp_time", "1", "Time between spawn the model");
+	g_remove 	  = CreateConVar("sm_disp_remove", "10.0", "Time to remove the model");
+	g_limit 	  = CreateConVar("sm_disp_limit", "0", "building per person. 0 to disable checking.");
+	g_admin		  = CreateConVar("sm_disp_admin", "0", "Enable/disable Admin flag check");
 }
 
 public void OnMapStart()
-{
+{	
 	PrecacheModel("models/buildables/teleporter.mdl");
 	PrecacheModel("models/buildables/dispenser_lvl3.mdl");
 	PrecacheModel("models/buildables/sentry3.mdl");
 	PrecacheModel("models/buildables/teleporter_blueprint_enter.mdl");
 	PrecacheModel("models/buildables/dispenser_blueprint.mdl");
-	PrecacheModel("models/buildables/sentry1_blueprint.mdl");
+	PrecacheModel("models/buildables/sentry3_blueprint.mdl");
 
 	for(int i = 1; i <= MaxClients; i++)
 	{
@@ -72,6 +74,7 @@ public Action CommandVoiceMenu(int client, int args)
 		GetCmdArg(1, voiceMenu1, sizeof(voiceMenu1));
 		GetCmdArg(2, voiceMenu2, sizeof(voiceMenu2));
 		
+		// X == 1
 		if(StringToInt(voiceMenu1) == 1)
 		{
 			int type = StringToInt(voiceMenu2);
@@ -123,6 +126,12 @@ public Action CommandProp(int client, int args)
 	{
 		SetEntityModel(propModelEntity, propModel);
 		SetEntityMoveType(propModelEntity, MOVETYPE_VPHYSICS);
+		
+		if(TF2_GetClientTeam(client) == TFTeam_Blue)
+		{
+			SetEntProp(propModelEntity, Prop_Send, "m_nSkin", 1);
+		}
+		
 		SetEntProp(propModelEntity, Prop_Send, "m_CollisionGroup", 1);
 		SetEntProp(propModelEntity, Prop_Send, "m_usSolidFlags", 16);
 		DispatchSpawn(propModelEntity);
@@ -145,20 +154,20 @@ public Action CommandProp(int client, int args)
 	// propModelBlueprint 생성 및 애니메이션
 	if(GetConVarBool(g_blueprint))
 	{
-		int propModelBlueprint = CreateEntityByName("prop_physics_override");
+		int propModelBlueprintEntity = CreateEntityByName("prop_physics_override");
 		
-		if(IsValidEntity(propModelBlueprint))
+		if(IsValidEntity(propModelBlueprintEntity))
 		{
-			SetEntityModel(propModelBlueprint, propModelBlueprint);
-			SetEntityMoveType(propModelBlueprint, MOVETYPE_NONE);
-			DispatchSpawn(propModelBlueprint);
+			SetEntityModel(propModelBlueprintEntity, propModelBlueprint);
+			SetEntityMoveType(propModelBlueprintEntity, MOVETYPE_NONE);
+			DispatchSpawn(propModelBlueprintEntity);
 			
 			float pos[3];
 			
 			GetEntPropVector(client, Prop_Send, "m_vecOrigin", pos);
-			TeleportEntity(propModelBlueprint, pos, NULL_VECTOR, NULL_VECTOR);
+			TeleportEntity(propModelBlueprintEntity, pos, NULL_VECTOR, NULL_VECTOR);
 			
-			CreateTimer(GetConVarFloat(g_remove), RemoveEnt, EntIndexToEntRef(propModelBlueprint));
+			CreateTimer(GetConVarFloat(g_remove), RemoveEnt, EntIndexToEntRef(propModelBlueprintEntity));
 		}
 	}
 	
@@ -218,7 +227,7 @@ char[] GetPropModelBlueprint(int args)
 		}
 		case 2:
 		{
-			propModelBlueprint = "models/buildables/sentry1_blueprint.mdl";
+			propModelBlueprint = "models/buildables/sentry3_blueprint.mdl";
 		}
 		default:
 		{
