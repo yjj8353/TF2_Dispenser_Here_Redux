@@ -127,6 +127,7 @@ public Action CommandProp(int client, int args)
 		SetEntityModel(propModelEntity, propModel);
 		SetEntityMoveType(propModelEntity, MOVETYPE_VPHYSICS);
 		
+		// 팀이 BLU면 skin을 1로 세팅
 		if(TF2_GetClientTeam(client) == TFTeam_Blue)
 		{
 			SetEntProp(propModelEntity, Prop_Send, "m_nSkin", 1);
