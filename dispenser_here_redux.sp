@@ -11,7 +11,7 @@ public Plugin myinfo =
 	name 		= "[TF2] Dispenser Here Redux",
 	author 		= "RetroTV",
 	description = "New syntax and additional options",
-	version 	= "0.1.0",
+	version 	= "1.1.0",
 	url			= ""
 };
 
