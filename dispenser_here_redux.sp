@@ -58,8 +58,7 @@ public void OnPluginStart()
 	g_admin		     = CreateConVar("sm_disp_admin", "0", "Enable/disable Admin flag check");
 }
 
-public void OnMapStart()
-{	
+public void OnMapStart() {	
 	PrecacheModel("models/buildables/teleporter.mdl");
 	PrecacheModel("models/buildables/dispenser_light.mdl");
 	PrecacheModel("models/buildables/dispenser_lvl2_light.mdl");
@@ -71,35 +70,29 @@ public void OnMapStart()
 	PrecacheModel("models/buildables/dispenser_blueprint.mdl");
 	PrecacheModel("models/buildables/sentry1_blueprint.mdl");
 
-	for(int i = 1; i <= MaxClients; i++)
-	{
+	for(int i = 1; i <= MaxClients; i++) {
 		building[i] = 0;
 	}
 }
 
-public Action CommandVoiceMenu(int client, int args)
-{
-	if(GetConVarBool(g_enable) && IsPlayerAlive(client))
-	{
+public Action CommandVoiceMenu(int client, int args) {
+	if(GetConVarBool(g_enable) && IsPlayerAlive(client)) {
 		GetCmdArg(1, voiceMenu1, sizeof(voiceMenu1));
 		GetCmdArg(2, voiceMenu2, sizeof(voiceMenu2));
 		
 		// X키 == 1
-		if(StringToInt(voiceMenu1) == 1)
-		{
+		if(StringToInt(voiceMenu1) == 1) {
 			int type = StringToInt(voiceMenu2);
 			
 			// X키 -> 4: Teleporter Here, X키 -> 5 Dispenser Here, X키 -> 6 Sentry Here
-			if(type >= 3 && type <= 5)
-			{
+			if(type >= 3 && type <= 5) {
 				CommandProp(client, type - 3);
 			}
 		}
 	}
 }
 
-public Action CommandProp(int client, int args)
-{
+public Action CommandProp(int client, int args) {
 	int currentTime = GetTime();
 	
 	// 마지막 프롭 생성시간(lastUsed) 값과 현재 시간 값을 비교하여 g_restriction 값보다 작으면 프롭을 생성하지 않음. 
@@ -121,18 +114,14 @@ public Action CommandProp(int client, int args)
 	int sentryLevel;
 	
 	// g_prop 값의 활성화 여부에 따라, prop 생성을 제한함.
-	if(GetConVarBool(g_prop))
-	{	
-		switch(args)
-		{
+	if(GetConVarBool(g_prop)) {	
+		switch(args) {
 			case 0: propModel = GetPropModel(args, 0);
-			case 1:
-			{
+			case 1: {
 				dispenserLevel = (GetConVarInt(g_dispenserLevel) == 0) ? GetRandomInt(1, 3) : GetConVarInt(g_dispenserLevel);
 				propModel = GetPropModel(args, dispenserLevel);
 			}
-			case 2:
-			{
+			case 2: {
 				sentryLevel = (GetConVarInt(g_sentryLevel) == 0) ? GetRandomInt(1, 3) : GetConVarInt(g_sentryLevel);
 				propModel = GetPropModel(args, sentryLevel);
 			}
@@ -140,22 +129,19 @@ public Action CommandProp(int client, int args)
 	}
 	
 	// g_blueporint 값의 활성화 여부에 따라, blueprint prop 생성을 제한함.
-	if(GetConVarBool(g_blueprint))
-	{
+	if(GetConVarBool(g_blueprint)) {
 		propModelBlueprint = GetPropModelBlueprint(args);
 	}
 	
 	// propModel 생성 및 애니메이션
 	int propModelEntity = CreateEntityByName("prop_physics_override");
 	
-	if(IsValidEntity(propModelEntity))
-	{
+	if(IsValidEntity(propModelEntity)) {
 		SetEntityModel(propModelEntity, propModel);
 		SetEntityMoveType(propModelEntity, MOVETYPE_VPHYSICS);
 		
 		// 팀이 BLU면 skin을 1로 세팅 (Default 값인 0는 RED임)
-		if(TF2_GetClientTeam(client) == TFTeam_Blue)
-		{
+		if(TF2_GetClientTeam(client) == TFTeam_Blue) {
 			SetEntProp(propModelEntity, Prop_Send, "m_nSkin", 1);
 		}
 		
@@ -179,12 +165,10 @@ public Action CommandProp(int client, int args)
 	}
 	
 	// propModelBlueprint 생성 및 애니메이션
-	if(GetConVarBool(g_blueprint))
-	{
+	if(GetConVarBool(g_blueprint)) {
 		int propModelBlueprintEntity = CreateEntityByName("prop_physics_override");
 		
-		if(IsValidEntity(propModelBlueprintEntity))
-		{
+		if(IsValidEntity(propModelBlueprintEntity)) {
 			SetEntityModel(propModelBlueprintEntity, propModelBlueprint);
 			SetEntityMoveType(propModelBlueprintEntity, MOVETYPE_NONE);
 			DispatchSpawn(propModelBlueprintEntity);
@@ -201,37 +185,29 @@ public Action CommandProp(int client, int args)
 	return Plugin_Handled;
 }
 
-public Action RemoveEnt(Handle timer, any entid)
-{
+public Action RemoveEnt(Handle timer, any entid) {
 	int ent = EntRefToEntIndex(entid);
 	
-	if(IsValidEdict(ent) && ent > MaxClients)
-	{
+	if(IsValidEdict(ent) && ent > MaxClients) {
 		AcceptEntityInput(ent, "Kill");
 	}
 }
 
 // dispenser와 sentry 레벨별 선택 가능하게 구현
-char[] GetPropModel(int args, int propLevel)
-{
+char[] GetPropModel(int args, int propLevel) {
 	char propModel[64];
 	
-	switch(args)
-	{
+	switch(args) {
 		case 0: propModel = "models/buildables/teleporter.mdl";
-		case 1:
-		{
-			switch(propLevel)
-			{
+		case 1: {
+			switch(propLevel) {
 				case 1: propModel = "models/buildables/dispenser_light.mdl";
 				case 2: propModel = "models/buildables/dispenser_lvl2_light.mdl";
 				case 3: propModel = "models/buildables/dispenser_lvl3_light.mdl";
 			}
 		}
-		case 2: 
-		{
-			switch(propLevel)
-			{
+		case 2: {
+			switch(propLevel) {
 				case 1: propModel = "models/buildables/sentry1.mdl";
 				case 2: propModel = "models/buildables/sentry2.mdl";
 				case 3: propModel = "models/buildables/sentry3.mdl";
@@ -242,12 +218,10 @@ char[] GetPropModel(int args, int propLevel)
 	return propModel;
 }
 
-char[] GetPropModelBlueprint(int args)
-{	
+char[] GetPropModelBlueprint(int args) {	
 	char propModelBlueprint[64];
 	
-	switch(args)
-	{
+	switch(args) {
 		case 0: propModelBlueprint = "models/buildables/teleporter_blueprint_enter.mdl";
 		case 1: propModelBlueprint = "models/buildables/dispenser_blueprint.mdl";
 		case 2: propModelBlueprint = "models/buildables/sentry1_blueprint.mdl";
