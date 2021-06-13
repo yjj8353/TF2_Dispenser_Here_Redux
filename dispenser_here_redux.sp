@@ -6,8 +6,7 @@
 #pragma semicolon 1;
 #pragma newdecls required;
 
-public Plugin myinfo = 
-{
+public Plugin myinfo = {
 	name 		= "[TF2] Dispenser Here Redux",
 	author 		= "RetroTV",
 	description = "New syntax and additional options",
@@ -31,8 +30,7 @@ Handle g_remove 	    = INVALID_HANDLE;
 Handle g_limit 		    = INVALID_HANDLE;
 Handle g_admin 		    = INVALID_HANDLE;
 
-public void OnPluginStart()
-{
+public void OnPluginStart() {
 	RegConsoleCmd("voicemenu", CommandVoiceMenu);
 	
 	/********************************************************************
